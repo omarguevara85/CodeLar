@@ -1,0 +1,25 @@
+diff --git a/src/Authentication/Provider/JwtAuth.php b/src/Authentication/Provider/JwtAuth.php
+index 8629738..37e3bb3 100644
+--- a/src/Authentication/Provider/JwtAuth.php
++++ b/src/Authentication/Provider/JwtAuth.php
+@@ -117,10 +117,18 @@ class JwtAuth implements AuthenticationProviderInterface {
+    * @return string|bool
+    *   The encoded JWT token. False if there is a problem encoding.
+    */
+-  public function generateToken() {
+-    $event = new JwtAuthGenerateEvent(new JsonWebToken());
++  public function generateToken(array $data) {
++    $jwt = new JsonWebToken();
++
++    // Agregar datos personalizados al token.
++    foreach ($data as $key => $value) {
++      $jwt->setClaim($key, $value);
++    }
++
++    $event = new JwtAuthGenerateEvent($jwt);
+     $this->eventDispatcher->dispatch($event, JwtAuthEvents::GENERATE);
+     $jwt = $event->getToken();
++
+     return $this->transcoder->encode($jwt);
+   }
+ 
