@@ -1,0 +1,5 @@
+name: 'CodeLar base'
+type: module
+description: 'Modulo base custom'
+package: CodeLar
+core_version_requirement: ^10 || ^11
