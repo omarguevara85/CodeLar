@@ -94,10 +94,14 @@ final class LoginResource extends ResourceBase {
                 $roles = $user->getRoles();
                 $jwt_service = \Drupal::service('jwt.authentication.jwt');
                 $token = $jwt_service->generateToken(['uid' => [$uid]]);
+                $user_id = $user->id();
+                $user_uuid = $user->uuid();
                 $logout_token = $jwt_service->generateToken(['uid' => [$uid]], ['exp' => time() + 300]); // Token válido por 5 minutos
 
                 $response_data = [
                     'token' => $token,
+                    'user_id' => $user_id,
+                    'user_uuid' => $user_uuid,
                     'name' => $user->getDisplayName(),
                     'created' => $user->getCreatedTime(),
                     'updated' => $user->getChangedTime(),
