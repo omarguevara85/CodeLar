@@ -3,3 +3,7 @@ services:
     class: Drupal\codelar_base\EventSubscriber\CodelarBaseSubscriber
     tags:
       - { name: event_subscriber }
+
+  codelar_base.user_custom:
+    class: Drupal\codelar_base\UserCustom
+    arguments: ['@entity_type.manager']

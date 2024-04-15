@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Password\PasswordInterface;
+use Drupal\codelar_base\UserCustom;
 
 /**
  * Represents Register records as resources.
@@ -64,31 +65,35 @@ final class RegisterResource extends ResourceBase {
    */
   protected $currentUser;
   protected $passwordService;
+  protected $userManager;
 
   public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    array $serializer_formats,
-    $logger,
-    AccountProxyInterface $current_user,
-    PasswordInterface $password_service
+      array $configuration,
+      $plugin_id,
+      $plugin_definition,
+      array $serializer_formats,
+      $logger,
+      AccountProxyInterface $current_user,
+      PasswordInterface $password_service,
+      UserCustom $user_custom
   ) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
-    $this->currentUser = $current_user;
-    $this->passwordService = $password_service;
+      parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
+      $this->currentUser = $current_user;
+      $this->passwordService = $password_service;
+      $this->user_custom = $user_custom;
   }
 
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->getParameter('serializer.formats'),
-      $container->get('logger.factory')->get('rest'),
-      $container->get('current_user'),
-      $container->get('password')
-    );
+      return new static(
+          $configuration,
+          $plugin_id,
+          $plugin_definition,
+          $container->getParameter('serializer.formats'),
+          $container->get('logger.factory')->get('rest'),
+          $container->get('current_user'),
+          $container->get('password'),
+          $container->get('codelar_base.user_custom')
+      );
   }
 
   public function post(Request $request) {
@@ -99,15 +104,7 @@ final class RegisterResource extends ResourceBase {
 
     $data = json_decode($request->getContent(), TRUE);
 
-    // Verificar si el nombre de usuario ya existe
-    if (user_load_by_name($data['username']) !== NULL) {
-        return new JsonResponse(['message' => 'The username is already taken'], 409);
-    }
-
-    // Verificar si el correo electrónico ya está registrado
-    if (user_load_by_mail($data['email']) !== NULL) {
-        return new JsonResponse(['message' => 'The email address is already registered'], 409);
-    }
+    // Pendiente por validar la existencia del usuario
 
     // Crear el usuario
     if (!empty($data['username']) && !empty($data['password']) && !empty($data['email'])) {
