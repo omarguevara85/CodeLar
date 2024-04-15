@@ -26,7 +26,7 @@ use Drupal\user\UserStorageInterface;
  *   id = "codelar_base_login",
  *   label = @Translation("Login"),
  *   uri_paths = {
- *     "create" = "/api/codelar-base-login"
+ *     "create" = "/api-login/codelar-base-login"
  *   }
  * )
  *
@@ -99,10 +99,10 @@ final class LoginResource extends ResourceBase {
                     'name' => $user->getDisplayName(),
                     'mail' => $user->getEmail(),
                 ];
-                $token = $jwt_service->generateToken($payload);
+                $token = $jwt_service->generateTokenPayLoad($payload, $uid);
                 $user_id = $user->id();
                 $user_uuid = $user->uuid();
-                $logout_token = $jwt_service->generateToken(['uid' => [$uid]], ['exp' => time() + 300]);
+                $logout_token = $jwt_service->generateTokenPayLoad(['uid' => [$uid]], ['exp' => time() + 300]);
 
                 $response_data = [
                     'token' => $token,

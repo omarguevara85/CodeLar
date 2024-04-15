@@ -99,7 +99,7 @@
         },
         "patches": {
             "drupal/jwt": {
-                "Add payload jwt": "patches/jwt_payload.patch"
+                "Custom jwt": "patches/jwt_payload_decode.patch"
             }
         }
     }

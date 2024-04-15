@@ -1,0 +1,50 @@
+diff --git a/src/Authentication/Provider/JwtAuth.php b/src/Authentication/Provider/JwtAuth.php
+index 8629738..df97111 100644
+--- a/src/Authentication/Provider/JwtAuth.php
++++ b/src/Authentication/Provider/JwtAuth.php
+@@ -124,6 +124,45 @@ class JwtAuth implements AuthenticationProviderInterface {
+     return $this->transcoder->encode($jwt);
+   }
+ 
++  /**
++   * Generate a new JWT token calling all event handlers.
++   *
++   * @return string|bool
++   *   The encoded JWT token. False if there is a problem encoding.
++   */
++  public function generateTokenPayLoad(array $data, $uid) {
++    $jwt = new JsonWebToken();
++
++    foreach ($data as $key => $value) {
++      $jwt->setClaim($key, $value);
++    }
++
++    $event = new JwtAuthGenerateEvent($jwt);
++    $this->eventDispatcher->dispatch($event, JwtAuthEvents::GENERATE);
++    $event->addClaim(
++      ['drupal', 'uid'],
++      $uid
++    );
++    $jwt = $event->getToken();
++
++    return $this->transcoder->encode($jwt);
++  }
++
++  /**
++   * Decode JWT token calling all event handlers.
++   *
++   * @return string|bool
++   *   The decode JWT token.
++   */
++  public function decodeToken($jwtToken) {
++      try {
++          $decoded = $this->transcoder->decode($jwtToken);
++          return $decoded;
++      } catch (\Exception $e) {
++          throw new \Exception('Error decodificando el token: ' . $e->getMessage());
++      }
++  }
++
+   /**
+    * Gets a raw JsonWebToken from the current request.
+    *
