@@ -1,0 +1,5 @@
+services:
+  codelar_base.event_subscriber:
+    class: Drupal\codelar_base\EventSubscriber\CodelarBaseSubscriber
+    tags:
+      - { name: event_subscriber }
